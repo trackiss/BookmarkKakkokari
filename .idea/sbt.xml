@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ScalaSbtSettings">
+    <option name="customVMEnabled" value="true" />
+    <option name="customVMPath" value="$USER_HOME$/scoop/apps/corretto8/current" />
+    <option name="linkedExternalProjectsSettings">
+      <SbtProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/modules/domain" />
+            <option value="$PROJECT_DIR$/modules/infrastructure" />
+            <option value="$PROJECT_DIR$/modules/interface_adapter" />
+            <option value="$PROJECT_DIR$/modules/use_case" />
+            <option value="$PROJECT_DIR$/project" />
+          </set>
+        </option>
+        <option name="resolveSbtClassifiers" value="true" />
+        <option name="sbtVersion" value="1.3.8" />
+        <option name="useQualifiedModuleNames" value="true" />
+      </SbtProjectSettings>
+    </option>
+  </component>
+</project>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id="use_case [file:/C:/Users/user/Documents/GitHub/BookmarkKakkokari/]" external.linked.project.path="$MODULE_DIR$/../../modules/use_case" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_11">
+    <output url="file://$MODULE_DIR$/../../modules/use_case/target/scala-2.13/classes" />
+    <output-test url="file://$MODULE_DIR$/../../modules/use_case/target/scala-2.13/test-classes" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../modules/use_case">
+      <sourceFolder url="file://$MODULE_DIR$/../../modules/use_case/src/main/scala" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../modules/use_case/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="domain" exported="" />
+    <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.13.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: io.jvm.uuid:scala-uuid_2.13:0.3.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: de.svenkubiak:jBCrypt:0.4.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.github.t3hnar:scala-bcrypt_2.13:4.1:jar" level="project" />
+    <orderEntry type="module" module-name="infrastructure" exported="" />
+  </component>
+</module>
