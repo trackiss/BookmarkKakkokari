@@ -1,6 +1,6 @@
 package domain.models.bookmark
 
-case class BookmarkUrl(private val value: String) {
+final case class BookmarkUrl(private val value: String) {
   require(value.forall(c => 0x20 < c && c < 0x7f))
   require(value.matches("""[^\s]+:[^\s]+"""))
 
