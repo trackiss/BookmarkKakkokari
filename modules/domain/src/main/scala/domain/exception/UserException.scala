@@ -1,0 +1,8 @@
+package domain.exception
+
+sealed trait UserException extends RuntimeException
+
+case object InvalidEmailAddressException extends UserException
+case object IllegalEncryptedException extends UserException
+case object InvalidCharacterPasswordExcetion extends UserException
+case object NotEnoughLengthPasswordException extends UserException

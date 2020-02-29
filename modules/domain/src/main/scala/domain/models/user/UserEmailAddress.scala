@@ -1,7 +1,16 @@
 package domain.models.user
 
-final case class UserEmailAddress(private val value: String) {
-  require(value.matches("""[^\s]+@[^\s]+"""))
+import domain.exception.{InvalidEmailAddressException, UserException}
 
+final case class UserEmailAddress private (private val value: String) {
   def asString: String = value
+}
+
+object UserEmailAddress {
+  def apply(value: String): Either[UserException, UserEmailAddress] =
+    Either.cond(
+      value.matches("""[^\s]+@[^\s]+"""),
+      new UserEmailAddress(value),
+      InvalidEmailAddressException
+    )
 }
