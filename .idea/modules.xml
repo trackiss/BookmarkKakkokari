@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/BookmarkKakkokari-build.iml" filepath="$PROJECT_DIR$/.idea/modules/BookmarkKakkokari-build.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/domain.iml" filepath="$PROJECT_DIR$/.idea/modules/domain.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/infrastructure.iml" filepath="$PROJECT_DIR$/.idea/modules/infrastructure.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/interface.iml" filepath="$PROJECT_DIR$/.idea/modules/interface.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/interface_adapter.iml" filepath="$PROJECT_DIR$/.idea/modules/interface_adapter.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/use_case.iml" filepath="$PROJECT_DIR$/.idea/modules/use_case.iml" />
     </modules>
