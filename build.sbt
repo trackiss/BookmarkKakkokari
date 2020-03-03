@@ -1,4 +1,3 @@
-lazy val dbDriver = "org.postgresql.Driver"
 lazy val dbUrl = "jdbc:postgresql://localhost/bookmark"
 lazy val dbUser = "postgres"
 lazy val dbPassword = "P@ssw0rd"
@@ -61,8 +60,19 @@ lazy val interface = (project in file("modules/interface"))
   .settings(name := "interface")
   .dependsOn(interface_adapter, infrastructure)
 
-lazy val root = (project in file("."))
+lazy val flyway = (project in file("flyway"))
   .enablePlugins(FlywayPlugin)
+  .settings(baseSettings)
+  .settings(
+    name := "flyway",
+    libraryDependencies += { "org.postgresql" % "postgresql" % psqlV },
+    flywayUrl := dbUrl,
+    flywayUser := dbUser,
+    flywayPassword := dbPassword,
+    flywayLocations := Seq("filesystem:flyway/src/main/resources/db")
+  )
+
+lazy val root = (project in file("."))
   .settings(baseSettings)
   .settings(
     name := "BookmarkKakkokari",
@@ -71,10 +81,6 @@ lazy val root = (project in file("."))
       "org.postgresql" % "postgresql" % psqlV,
       "com.typesafe.slick" %% "slick" % slickV,
       "com.typesafe.slick" %% "slick-codegen" % slickV
-    ),
-    flywayUrl := dbUrl,
-    flywayUser := dbUser,
-    flywayPassword := dbPassword,
-    flywayLocations := Seq("filesystem:src/main/resources/db")
+    )
   )
   .aggregate(infrastructure, domain, use_case, interface_adapter, interface)
