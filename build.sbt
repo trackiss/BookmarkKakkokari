@@ -1,6 +1,18 @@
+import slick.jdbc._
+
 lazy val dbUrl = "jdbc:postgresql://localhost/bookmark"
 lazy val dbUser = "postgres"
 lazy val dbPassword = "P@ssw0rd"
+
+slickCodegenDatabaseUrl := dbUrl
+slickCodegenDatabaseUser := dbUser
+slickCodegenDatabasePassword := dbPassword
+slickCodegenDriver := PostgresProfile
+slickCodegenJdbcDriver := "org.postgresql.Driver"
+slickCodegenOutputDir := baseDirectory.value / "modules" / "interface_adapter" / "src" / "main" / "scala"
+slickCodegenOutputPackage := "interface_adapter"
+slickCodegenExcludedTables := Seq("flyway_schema_history")
+Compile / sourceGenerators += slickCodegen.taskValue
 
 lazy val accordV = "0.7.5"
 lazy val akkaV = "2.6.3"
@@ -73,14 +85,10 @@ lazy val flyway = (project in file("flyway"))
   )
 
 lazy val root = (project in file("."))
+  .enablePlugins(CodegenPlugin)
   .settings(baseSettings)
   .settings(
     name := "BookmarkKakkokari",
-    libraryDependencies ++= Seq(
-      "ch.qos.logback" % "logback-classic" % logV,
-      "org.postgresql" % "postgresql" % psqlV,
-      "com.typesafe.slick" %% "slick" % slickV,
-      "com.typesafe.slick" %% "slick-codegen" % slickV
-    )
+    libraryDependencies ++= Seq("com.typesafe.slick" %% "slick" % slickV)
   )
   .aggregate(infrastructure, domain, use_case, interface_adapter, interface)
