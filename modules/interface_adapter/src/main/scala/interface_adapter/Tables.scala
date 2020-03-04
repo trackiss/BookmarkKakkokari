@@ -23,23 +23,22 @@ trait Tables {
    *  @param title Database column title SqlType(varchar)
    *  @param url Database column url SqlType(varchar)
    *  @param comment Database column comment SqlType(text)
-   *  @param tagIds Database column tag_ids SqlType(_uuid), Length(2147483647,false), Default(None)
    *  @param isFavorited Database column is_favorited SqlType(bool), Default(false)
    *  @param ownerId Database column owner_id SqlType(uuid)
    *  @param isActive Database column is_active SqlType(bool), Default(true)
    *  @param createdAt Database column created_at SqlType(timestamp)
    *  @param updatedAt Database column updated_at SqlType(timestamp) */
-  case class BookmarksRow(id: java.util.UUID, title: String, url: String, comment: String, tagIds: Option[String] = None, isFavorited: Boolean = false, ownerId: java.util.UUID, isActive: Boolean = true, createdAt: java.sql.Timestamp, updatedAt: java.sql.Timestamp)
+  case class BookmarksRow(id: java.util.UUID, title: String, url: String, comment: String, isFavorited: Boolean = false, ownerId: java.util.UUID, isActive: Boolean = true, createdAt: java.sql.Timestamp, updatedAt: java.sql.Timestamp)
   /** GetResult implicit for fetching BookmarksRow objects using plain SQL queries */
-  implicit def GetResultBookmarksRow(implicit e0: GR[java.util.UUID], e1: GR[String], e2: GR[Option[String]], e3: GR[Boolean], e4: GR[java.sql.Timestamp]): GR[BookmarksRow] = GR{
+  implicit def GetResultBookmarksRow(implicit e0: GR[java.util.UUID], e1: GR[String], e2: GR[Boolean], e3: GR[java.sql.Timestamp]): GR[BookmarksRow] = GR{
     prs => import prs._
-    BookmarksRow.tupled((<<[java.util.UUID], <<[String], <<[String], <<[String], <<?[String], <<[Boolean], <<[java.util.UUID], <<[Boolean], <<[java.sql.Timestamp], <<[java.sql.Timestamp]))
+    BookmarksRow.tupled((<<[java.util.UUID], <<[String], <<[String], <<[String], <<[Boolean], <<[java.util.UUID], <<[Boolean], <<[java.sql.Timestamp], <<[java.sql.Timestamp]))
   }
   /** Table description of table bookmarks. Objects of this class serve as prototypes for rows in queries. */
   class Bookmarks(_tableTag: Tag) extends profile.api.Table[BookmarksRow](_tableTag, "bookmarks") {
-    def * = (id, title, url, comment, tagIds, isFavorited, ownerId, isActive, createdAt, updatedAt) <> (BookmarksRow.tupled, BookmarksRow.unapply)
+    def * = (id, title, url, comment, isFavorited, ownerId, isActive, createdAt, updatedAt) <> (BookmarksRow.tupled, BookmarksRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = ((Rep.Some(id), Rep.Some(title), Rep.Some(url), Rep.Some(comment), tagIds, Rep.Some(isFavorited), Rep.Some(ownerId), Rep.Some(isActive), Rep.Some(createdAt), Rep.Some(updatedAt))).shaped.<>({r=>import r._; _1.map(_=> BookmarksRow.tupled((_1.get, _2.get, _3.get, _4.get, _5, _6.get, _7.get, _8.get, _9.get, _10.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = ((Rep.Some(id), Rep.Some(title), Rep.Some(url), Rep.Some(comment), Rep.Some(isFavorited), Rep.Some(ownerId), Rep.Some(isActive), Rep.Some(createdAt), Rep.Some(updatedAt))).shaped.<>({r=>import r._; _1.map(_=> BookmarksRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get, _8.get, _9.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(uuid), PrimaryKey */
     val id: Rep[java.util.UUID] = column[java.util.UUID]("id", O.PrimaryKey)
@@ -49,8 +48,6 @@ trait Tables {
     val url: Rep[String] = column[String]("url")
     /** Database column comment SqlType(text) */
     val comment: Rep[String] = column[String]("comment")
-    /** Database column tag_ids SqlType(_uuid), Length(2147483647,false), Default(None) */
-    val tagIds: Rep[Option[String]] = column[Option[String]]("tag_ids", O.Length(2147483647,varying=false), O.Default(None))
     /** Database column is_favorited SqlType(bool), Default(false) */
     val isFavorited: Rep[Boolean] = column[Boolean]("is_favorited", O.Default(false))
     /** Database column owner_id SqlType(uuid) */
@@ -103,8 +100,8 @@ trait Tables {
     /** Database column updated_at SqlType(timestamp) */
     val updatedAt: Rep[java.sql.Timestamp] = column[java.sql.Timestamp]("updated_at")
 
-    /** Foreign key referencing Users (database name tags_owner_id_fkey) */
-    lazy val usersFk = foreignKey("tags_owner_id_fkey", ownerId, Users)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+    /** Foreign key referencing Bookmarks (database name tags_owner_id_fkey) */
+    lazy val bookmarksFk = foreignKey("tags_owner_id_fkey", ownerId, Bookmarks)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
   }
   /** Collection-like TableQuery object for table Tags */
   lazy val Tags = new TableQuery(tag => new Tags(tag))

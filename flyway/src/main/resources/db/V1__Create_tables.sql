@@ -14,7 +14,6 @@ CREATE TABLE bookmarks (
   title         varchar   NOT NULL,
   url           varchar   NOT NULL,
   comment       text      NOT NULL,
-  tag_ids       uuid[]    ,
   is_favorited  boolean   NOT NULL DEFAULT false,
   owner_id      uuid      NOT NULL REFERENCES users,
   is_active     boolean   NOT NULL DEFAULT true,
@@ -26,7 +25,7 @@ CREATE TABLE tags (
   id          uuid      PRIMARY KEY,
   name        varchar   NOT NULL,
   count_item  int       NOT NULL DEFAULT 0,
-  owner_id    uuid      NOT NULL REFERENCES users,
+  owner_id    uuid      NOT NULL REFERENCES bookmarks,
   is_active   boolean   NOT NULL DEFAULT true,
   created_at  timestamp NOT NULL,
   updated_at  timestamp NOT NULL
