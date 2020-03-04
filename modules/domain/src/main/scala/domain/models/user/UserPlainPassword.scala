@@ -1,10 +1,10 @@
 package domain.models.user
 
 import com.github.t3hnar.bcrypt._
-import domain.exception.{
-  InvalidCharacterPasswordExcetion,
-  NotEnoughLengthPasswordException,
-  UserException
+import domain.error.{
+  InvalidCharacterPasswordError,
+  NotEnoughLengthPasswordError,
+  UserError
 }
 
 final case class UserPlainPassword private (private val value: String) {
@@ -18,13 +18,13 @@ final case class UserPlainPassword private (private val value: String) {
 }
 
 object UserPlainPassword {
-  def apply(value: String): Either[UserException, UserPlainPassword] =
+  def apply(value: String): Either[UserError, UserPlainPassword] =
     for {
       e1 <- Either.cond(
         value.forall(c => 0x20 < c && c < 0x7f),
         new UserPlainPassword(value),
-        InvalidCharacterPasswordExcetion
+        InvalidCharacterPasswordError
       )
-      e2 <- Either.cond(value.length >= 4, e1, NotEnoughLengthPasswordException)
+      e2 <- Either.cond(value.length >= 4, e1, NotEnoughLengthPasswordError)
     } yield e2
 }
