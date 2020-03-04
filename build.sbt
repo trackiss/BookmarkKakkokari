@@ -11,8 +11,8 @@ slickCodegenDatabaseUser := dbUser
 slickCodegenDatabasePassword := dbPassword
 slickCodegenDriver := PostgresProfile
 slickCodegenJdbcDriver := "org.postgresql.Driver"
-slickCodegenOutputDir := baseDirectory.value / "modules" / "interface_adapter" / "src" / "main" / "scala"
-slickCodegenOutputPackage := "interface_adapter"
+slickCodegenOutputDir := baseDirectory.value / "src" / "main" / "scala"
+slickCodegenOutputPackage := ""
 slickCodegenExcludedTables := Seq("flyway_schema_history")
 slickCodegenCodeGenerator := { (model: m.Model) =>
   new SourceCodeGenerator(model) {
@@ -84,11 +84,6 @@ lazy val interface_adapter =
     )
     .dependsOn(use_case, infrastructure)
 
-lazy val interface = (project in file("modules/interface"))
-  .settings(baseSettings)
-  .settings(name := "interface")
-  .dependsOn(interface_adapter, infrastructure)
-
 lazy val flyway = (project in file("flyway"))
   .enablePlugins(FlywayPlugin)
   .settings(baseSettings)
@@ -107,8 +102,10 @@ lazy val root = (project in file("."))
   .settings(
     name := "BookmarkKakkokari",
     libraryDependencies ++= Seq(
+      "com.typesafe.akka" %% "akka-stream" % akkaV,
+      "com.typesafe.akka" %% "akka-http-core" % httpV,
       "com.typesafe.slick" %% "slick" % slickV,
       "io.jvm.uuid" %% "scala-uuid" % uuidV
     )
   )
-  .aggregate(infrastructure, domain, use_case, interface_adapter, interface)
+  .aggregate(infrastructure, domain, use_case, interface_adapter)

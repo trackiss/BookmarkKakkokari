@@ -12,7 +12,6 @@
             <option value="$PROJECT_DIR$/flyway" />
             <option value="$PROJECT_DIR$/modules/domain" />
             <option value="$PROJECT_DIR$/modules/infrastructure" />
-            <option value="$PROJECT_DIR$/modules/interface" />
             <option value="$PROJECT_DIR$/modules/interface_adapter" />
             <option value="$PROJECT_DIR$/modules/use_case" />
             <option value="$PROJECT_DIR$/project" />
