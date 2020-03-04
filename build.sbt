@@ -79,8 +79,7 @@ lazy val interface_adapter =
           "ch.qos.logback" % "logback-classic" % logV,
           "org.postgresql" % "postgresql" % psqlV,
           "com.typesafe.slick" %% "slick" % slickV,
-          "com.typesafe.slick" %% "slick-hikaricp" % slickV,
-          "com.typesafe.slick" %% "slick-codegen" % slickV
+          "com.typesafe.slick" %% "slick-hikaricp" % slickV
         )
     )
     .dependsOn(use_case, infrastructure)
