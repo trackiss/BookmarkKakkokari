@@ -1,4 +1,6 @@
-import slick.jdbc._
+import slick.{model => m}
+import slick.codegen.SourceCodeGenerator
+import slick.jdbc.PostgresProfile
 
 lazy val dbUrl = "jdbc:postgresql://localhost/bookmark"
 lazy val dbUser = "postgres"
@@ -12,6 +14,22 @@ slickCodegenJdbcDriver := "org.postgresql.Driver"
 slickCodegenOutputDir := baseDirectory.value / "modules" / "interface_adapter" / "src" / "main" / "scala"
 slickCodegenOutputPackage := "interface_adapter"
 slickCodegenExcludedTables := Seq("flyway_schema_history")
+slickCodegenCodeGenerator := { (model: m.Model) =>
+  new SourceCodeGenerator(model) {
+    override def code: String =
+      "import java.time.Instant\n" + "import io.jvm.uuid._\n" + super.code
+
+    override def Table = new Table(_) {
+      override def Column = new Column(_) {
+        override def rawType: String = model.tpe match {
+          case "java.sql.Timestamp" => "Instant"
+          case "java.util.UUID"     => "UUID"
+          case _                    => super.rawType
+        }
+      }
+    }
+  }
+}
 Compile / sourceGenerators += slickCodegen.taskValue
 
 lazy val accordV = "0.7.5"
@@ -89,6 +107,9 @@ lazy val root = (project in file("."))
   .settings(baseSettings)
   .settings(
     name := "BookmarkKakkokari",
-    libraryDependencies ++= Seq("com.typesafe.slick" %% "slick" % slickV)
+    libraryDependencies ++= Seq(
+      "com.typesafe.slick" %% "slick" % slickV,
+      "io.jvm.uuid" %% "scala-uuid" % uuidV
+    )
   )
   .aggregate(infrastructure, domain, use_case, interface_adapter, interface)
