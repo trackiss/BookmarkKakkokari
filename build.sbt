@@ -11,8 +11,8 @@ slickCodegenDatabaseUser := dbUser
 slickCodegenDatabasePassword := dbPassword
 slickCodegenDriver := PostgresProfile
 slickCodegenJdbcDriver := "org.postgresql.Driver"
-slickCodegenOutputDir := baseDirectory.value / "src" / "main" / "scala"
-slickCodegenOutputPackage := ""
+slickCodegenOutputDir := baseDirectory.value / "modules" / "interface_adapter" / "src" / "main" / "scala"
+slickCodegenOutputPackage := "interface_adapter"
 slickCodegenExcludedTables := Seq("flyway_schema_history")
 slickCodegenCodeGenerator := { (model: m.Model) =>
   new SourceCodeGenerator(model) {
