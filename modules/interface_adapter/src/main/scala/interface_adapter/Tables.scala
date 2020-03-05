@@ -112,12 +112,12 @@ trait Tables {
    *  @param id Database column id SqlType(uuid), PrimaryKey
    *  @param emailAddress Database column email_address SqlType(varchar)
    *  @param encryptedPassword Database column encrypted_password SqlType(varchar)
-   *  @param salt Database column salt SqlType(varchar)
+   *  @param passwordSalt Database column password_salt SqlType(varchar)
    *  @param countItem Database column count_item SqlType(int4), Default(0)
    *  @param isActive Database column is_active SqlType(bool), Default(true)
    *  @param createdAt Database column created_at SqlType(timestamp)
    *  @param updatedAt Database column updated_at SqlType(timestamp) */
-  case class UsersRow(id: UUID, emailAddress: String, encryptedPassword: String, salt: String, countItem: Int = 0, isActive: Boolean = true, createdAt: Instant, updatedAt: Instant)
+  case class UsersRow(id: UUID, emailAddress: String, encryptedPassword: String, passwordSalt: String, countItem: Int = 0, isActive: Boolean = true, createdAt: Instant, updatedAt: Instant)
   /** GetResult implicit for fetching UsersRow objects using plain SQL queries */
   implicit def GetResultUsersRow(implicit e0: GR[UUID], e1: GR[String], e2: GR[Int], e3: GR[Boolean], e4: GR[Instant]): GR[UsersRow] = GR{
     prs => import prs._
@@ -125,9 +125,9 @@ trait Tables {
   }
   /** Table description of table users. Objects of this class serve as prototypes for rows in queries. */
   class Users(_tableTag: Tag) extends profile.api.Table[UsersRow](_tableTag, "users") {
-    def * = (id, emailAddress, encryptedPassword, salt, countItem, isActive, createdAt, updatedAt) <> (UsersRow.tupled, UsersRow.unapply)
+    def * = (id, emailAddress, encryptedPassword, passwordSalt, countItem, isActive, createdAt, updatedAt) <> (UsersRow.tupled, UsersRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = ((Rep.Some(id), Rep.Some(emailAddress), Rep.Some(encryptedPassword), Rep.Some(salt), Rep.Some(countItem), Rep.Some(isActive), Rep.Some(createdAt), Rep.Some(updatedAt))).shaped.<>({r=>import r._; _1.map(_=> UsersRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get, _8.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = ((Rep.Some(id), Rep.Some(emailAddress), Rep.Some(encryptedPassword), Rep.Some(passwordSalt), Rep.Some(countItem), Rep.Some(isActive), Rep.Some(createdAt), Rep.Some(updatedAt))).shaped.<>({r=>import r._; _1.map(_=> UsersRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get, _8.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(uuid), PrimaryKey */
     val id: Rep[UUID] = column[UUID]("id", O.PrimaryKey)
@@ -135,8 +135,8 @@ trait Tables {
     val emailAddress: Rep[String] = column[String]("email_address")
     /** Database column encrypted_password SqlType(varchar) */
     val encryptedPassword: Rep[String] = column[String]("encrypted_password")
-    /** Database column salt SqlType(varchar) */
-    val salt: Rep[String] = column[String]("salt")
+    /** Database column password_salt SqlType(varchar) */
+    val passwordSalt: Rep[String] = column[String]("password_salt")
     /** Database column count_item SqlType(int4), Default(0) */
     val countItem: Rep[Int] = column[Int]("count_item", O.Default(0))
     /** Database column is_active SqlType(bool), Default(true) */

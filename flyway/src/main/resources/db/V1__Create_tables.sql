@@ -2,7 +2,7 @@ CREATE TABLE users (
   id                  uuid      PRIMARY KEY,
   email_address       varchar   NOT NULL,
   encrypted_password  varchar   NOT NULL,
-  salt                varchar   NOT NULL,
+  password_salt       varchar   NOT NULL,
   count_item          int       NOT NULL DEFAULT 0,
   is_active           boolean   NOT NULL DEFAULT true,
   created_at          timestamp NOT NULL,
