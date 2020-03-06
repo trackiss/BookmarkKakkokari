@@ -1,6 +1,18 @@
 package domain.models
 
-sealed trait ActiveStatus
+sealed trait ActiveStatus {
+  def asBoolean: Boolean
+}
 
-case object InActive extends ActiveStatus
-case object Active extends ActiveStatus
+object ActiveStatus {
+  def fromBoolean(value: Boolean): ActiveStatus =
+    if (value) Active else InActive
+}
+
+case object InActive extends ActiveStatus {
+  override def asBoolean: Boolean = false
+}
+
+case object Active extends ActiveStatus {
+  override def asBoolean: Boolean = true
+}
