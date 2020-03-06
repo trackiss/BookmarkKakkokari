@@ -17,9 +17,7 @@ final case class UserEncryptedPassword private (private val value: String) {
 }
 
 object UserEncryptedPassword {
-  private[domain] def apply(
-    value: String
-  ): Either[UserError, UserEncryptedPassword] =
+  def apply(value: String): Either[UserError, UserEncryptedPassword] =
     Either.cond(
       value.startsWith("""$2a$10"""),
       new UserEncryptedPassword(value),
