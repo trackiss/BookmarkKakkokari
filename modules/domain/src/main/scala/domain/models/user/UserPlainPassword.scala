@@ -8,7 +8,7 @@ import domain.error.{
 }
 
 final case class UserPlainPassword private (private val value: String) {
-  private def encrypt(salt: UserPasswordSalt): UserEncryptedPassword =
+  def encrypt(salt: UserPasswordSalt): UserEncryptedPassword =
     UserEncryptedPassword(value.bcrypt(salt.asString)) match {
       case Right(v) => v
       case Left(_)  => throw new RuntimeException
