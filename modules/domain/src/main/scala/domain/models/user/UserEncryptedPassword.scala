@@ -13,7 +13,7 @@ final case class UserEncryptedPassword private (private val value: String) {
     }
   }
 
-  private[domain] def asString: String = value
+  def asString: String = value
 }
 
 object UserEncryptedPassword {
