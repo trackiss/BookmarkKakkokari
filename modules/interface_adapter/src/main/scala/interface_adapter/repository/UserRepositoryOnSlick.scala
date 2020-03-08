@@ -24,18 +24,17 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
     val error: Future[Option[UserError]] = for {
       e1 <- findById(user.id)
       e2 <- findByEmailAddress(user.emailAddress)
-    } yield {
+    } yield
       if (e1.isDefined)
         Some(ExistedIdError)
       else if (e2.isDefined)
         Some(ExistedEmailAddressError)
       else
         None
-    }
 
     error.transformWith {
       case Success(v) =>
-        Future.successful {
+        Future.successful(
           if (v.isDefined)
             db.run(Users += entityToRow(user)).transformWith {
               case Success(_) => Future.successful(Right(()))
@@ -43,7 +42,7 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
                 Future.failed(UserInsertFailedException(user.id, e))
             } else
             Future(Left(v.get))
-        }
+        )
       case Failure(e) => Future.failed(UserInsertFailedException(user.id, e))
     }.flatten
   }
