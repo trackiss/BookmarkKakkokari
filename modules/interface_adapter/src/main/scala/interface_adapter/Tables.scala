@@ -145,6 +145,9 @@ trait Tables {
     val createdAt: Rep[Instant] = column[Instant]("created_at")
     /** Database column updated_at SqlType(timestamp) */
     val updatedAt: Rep[Instant] = column[Instant]("updated_at")
+
+    /** Uniqueness Index over (emailAddress) (database name users_email_address_key) */
+    val index1 = index("users_email_address_key", emailAddress, unique=true)
   }
   /** Collection-like TableQuery object for table Users */
   lazy val Users = new TableQuery(tag => new Users(tag))

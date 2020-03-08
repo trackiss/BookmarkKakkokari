@@ -1,6 +1,6 @@
 CREATE TABLE users (
   id                  uuid      PRIMARY KEY,
-  email_address       varchar   NOT NULL,
+  email_address       varchar   NOT NULL UNIQUE,
   encrypted_password  varchar   NOT NULL,
   password_salt       varchar   NOT NULL,
   count_item          int       NOT NULL DEFAULT 0,
