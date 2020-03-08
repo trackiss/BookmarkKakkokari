@@ -6,7 +6,11 @@ import interface_adapter.Tables
 import interface_adapter.exception._
 import slick.jdbc.{JdbcProfile, PostgresProfile}
 import slick.jdbc.PostgresProfile.api._
-import use_case.error.{ExistedEmailAddressError, ExistedIdError, UserError}
+import use_case.error.{
+  DuplicatedEmailAddressError,
+  DuplicatedIdError,
+  UserError
+}
 import use_case.repository.UserRepository
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -26,9 +30,9 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
       e2 <- findByEmailAddress(user.emailAddress)
     } yield
       if (e1.isDefined)
-        Some(ExistedIdError)
+        Some(DuplicatedIdError)
       else if (e2.isDefined)
-        Some(ExistedEmailAddressError)
+        Some(DuplicatedEmailAddressError)
       else
         None
 
