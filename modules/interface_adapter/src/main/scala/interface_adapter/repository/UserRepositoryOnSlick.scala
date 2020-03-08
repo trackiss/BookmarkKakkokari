@@ -9,6 +9,7 @@ import slick.jdbc.PostgresProfile.api._
 import use_case.error.{
   DuplicatedEmailAddressError,
   DuplicatedIdError,
+  NotFoundIdError,
   UserError
 }
 import use_case.repository.UserRepository
@@ -78,15 +79,18 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
 
   override def updateEmailAddress(id: UserId, emailAddress: UserEmailAddress)(
     implicit ec: ExecutionContext
-  ): Future[Option[Unit]] = {
+  ): Future[Either[UserError, Unit]] = {
     val query = Users.findBy(_.id).applied(id.asUuid)
 
     db.run(query.result.headOption).transformWith {
       case Success(v) =>
-        Future.successful(v.map { _ =>
-          db.run(query.map(_.emailAddress).update(emailAddress.asString))
-          ()
-        })
+        Future.successful(
+          if (v.isDefined) {
+            db.run(query.map(_.emailAddress).update(emailAddress.asString))
+            Right(())
+          } else
+            Left(NotFoundIdError)
+        )
       case Failure(e) =>
         Future.failed(UserUpdateEmailAddressFailedException(id, e))
     }
@@ -96,34 +100,34 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
     id: UserId,
     encryptedPassword: UserEncryptedPassword,
     passwordSalt: UserPasswordSalt
-  )(implicit ec: ExecutionContext): Future[Option[Unit]] = {
+  )(implicit ec: ExecutionContext): Future[Either[UserError, Unit]] = {
     val query = Users.findBy(_.id).applied(id.asUuid)
 
     db.run(query.result.headOption).transformWith {
       case Success(v) =>
-        Future.successful(v.map { _ =>
+        Future.successful(if (v.isDefined) {
           db.run(
             query
               .map(u => (u.encryptedPassword, u.passwordSalt))
               .update(encryptedPassword.asString, passwordSalt.asString)
           )
-          ()
-        })
+          Right(())
+        } else Left(NotFoundIdError))
       case Failure(e) => Future.failed(UserUpdatePasswordFailedException(id, e))
     }
   }
 
   override def deleteById(
     id: UserId
-  )(implicit ec: ExecutionContext): Future[Option[Unit]] = {
+  )(implicit ec: ExecutionContext): Future[Either[UserError, Unit]] = {
     val query = Users.findBy(_.id).applied(id.asUuid)
 
     db.run(query.result.headOption).transformWith {
       case Success(v) =>
-        Future.successful(v.map { _ =>
+        Future.successful(if (v.isDefined) {
           db.run(query.delete)
-          ()
-        })
+          Right(())
+        } else Left(NotFoundIdError))
       case Failure(e) => Future.failed(UserDeleteFailedException(id, e))
     }
   }

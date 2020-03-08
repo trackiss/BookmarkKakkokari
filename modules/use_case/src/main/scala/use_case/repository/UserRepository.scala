@@ -18,15 +18,15 @@ trait UserRepository {
 
   def updateEmailAddress(id: UserId, emailAddress: UserEmailAddress)(
     implicit ec: ExecutionContext
-  ): Future[Option[Unit]]
+  ): Future[Either[UserError, Unit]]
 
   def updatePassword(
     id: UserId,
     encryptedPassword: UserEncryptedPassword,
     passwordSalt: UserPasswordSalt
-  )(implicit ec: ExecutionContext): Future[Option[Unit]]
+  )(implicit ec: ExecutionContext): Future[Either[UserError, Unit]]
 
   def deleteById(id: UserId)(
     implicit ec: ExecutionContext
-  ): Future[Option[Unit]]
+  ): Future[Either[UserError, Unit]]
 }
