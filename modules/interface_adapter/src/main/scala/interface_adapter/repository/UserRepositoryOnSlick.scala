@@ -26,40 +26,33 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
   override def insert(
     user: User
   )(implicit ec: ExecutionContext): Future[Either[UserError, Unit]] = {
+    val id = findById(user.id)
+    val email = findByEmailAddress(user.emailAddress)
+
     val error: Future[Option[UserError]] = for {
-      e1 <- findById(user.id)
-      e2 <- findByEmailAddress(user.emailAddress)
-    } yield
-      if (e1.isDefined)
-        Some(DuplicatedIdError)
-      else if (e2.isDefined)
-        Some(DuplicatedEmailAddressError)
-      else
-        None
+      e1 <- id
+      e2 <- email
+      dupId = e1.map(_ => DuplicatedIdError)
+      dupEmail = e2.map(_ => DuplicatedEmailAddressError)
+    } yield dupId.orElse(dupEmail)
 
     error.transformWith {
-      case Success(v) =>
-        Future.successful(
-          if (v.isDefined)
-            db.run(Users += entityToRow(user)).transformWith {
-              case Success(_) => Future.successful(Right(()))
-              case Failure(e) =>
-                Future.failed(UserInsertFailedException(user.id, e))
-            } else
-            Future(Left(v.get))
-        )
-      case Failure(e) => Future.failed(UserInsertFailedException(user.id, e))
-    }.flatten
+      case Success(None) =>
+        db.run(Users += entityToRow(user))
+          .transform(_ => Right(()), e => UserInsertFailedException(user.id, e))
+      case Success(Some(v)) => Future(Left(v))
+      case Failure(e)       => Future.failed(UserInsertFailedException(user.id, e))
+    }
   }
 
   override def findById(
     id: UserId
   )(implicit ec: ExecutionContext): Future[Option[User]] =
     db.run(Users.findBy(_.id).applied(id.asUuid).result.headOption)
-      .transformWith {
-        case Success(v) => Future.successful(v.map(rowToEntity))
-        case Failure(e) => Future.failed(UserFindByIdFailedException(id, e))
-      }
+      .transform(
+        v => v.map(rowToEntity),
+        e => UserFindByIdFailedException(id, e)
+      )
 
   override def findByEmailAddress(
     emailAddress: UserEmailAddress
@@ -71,29 +64,25 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
           .result
           .headOption
       )
-      .transformWith {
-        case Success(v) => Future.successful(v.map(rowToEntity))
-        case Failure(e) =>
-          Future.failed(UserFindByEmailAddressFailedException(emailAddress, e))
-      }
+      .transform(
+        v => v.map(rowToEntity),
+        e => UserFindByEmailAddressFailedException(emailAddress, e)
+      )
 
   override def updateEmailAddress(id: UserId, emailAddress: UserEmailAddress)(
     implicit ec: ExecutionContext
   ): Future[Either[UserError, Unit]] = {
     val query = Users.findBy(_.id).applied(id.asUuid)
 
-    db.run(query.result.headOption).transformWith {
-      case Success(v) =>
-        Future.successful(
-          if (v.isDefined) {
+    db.run(query.result.headOption)
+      .transform(
+        v =>
+          Either.cond(v.isDefined, {
             db.run(query.map(_.emailAddress).update(emailAddress.asString))
-            Right(())
-          } else
-            Left(NotFoundIdError)
-        )
-      case Failure(e) =>
-        Future.failed(UserUpdateEmailAddressFailedException(id, e))
-    }
+            ()
+          }, NotFoundIdError),
+        e => UserUpdateEmailAddressFailedException(id, e)
+      )
   }
 
   override def updatePassword(
@@ -103,18 +92,19 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
   )(implicit ec: ExecutionContext): Future[Either[UserError, Unit]] = {
     val query = Users.findBy(_.id).applied(id.asUuid)
 
-    db.run(query.result.headOption).transformWith {
-      case Success(v) =>
-        Future.successful(if (v.isDefined) {
-          db.run(
-            query
-              .map(u => (u.encryptedPassword, u.passwordSalt))
-              .update(encryptedPassword.asString, passwordSalt.asString)
-          )
-          Right(())
-        } else Left(NotFoundIdError))
-      case Failure(e) => Future.failed(UserUpdatePasswordFailedException(id, e))
-    }
+    db.run(query.result.headOption)
+      .transform(
+        v =>
+          Either.cond(v.isDefined, {
+            db.run(
+              query
+                .map(u => (u.encryptedPassword, u.passwordSalt))
+                .update(encryptedPassword.asString, passwordSalt.asString)
+            )
+            ()
+          }, NotFoundIdError),
+        e => UserUpdatePasswordFailedException(id, e)
+      )
   }
 
   override def deleteById(
@@ -122,14 +112,15 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
   )(implicit ec: ExecutionContext): Future[Either[UserError, Unit]] = {
     val query = Users.findBy(_.id).applied(id.asUuid)
 
-    db.run(query.result.headOption).transformWith {
-      case Success(v) =>
-        Future.successful(if (v.isDefined) {
-          db.run(query.delete)
-          Right(())
-        } else Left(NotFoundIdError))
-      case Failure(e) => Future.failed(UserDeleteFailedException(id, e))
-    }
+    db.run(query.result.headOption)
+      .transform(
+        v =>
+          Either.cond(v.isDefined, {
+            db.run(query.delete)
+            ()
+          }, NotFoundIdError),
+        e => UserDeleteFailedException(id, e)
+      )
   }
 
   private def entityToRow(user: User): UsersRow =
