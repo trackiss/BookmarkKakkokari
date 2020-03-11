@@ -1,3 +1,8 @@
+import com.github.tototoshi.sbt.slick.CodegenPlugin.autoImport.{
+  slickCodegenDatabaseUser,
+  slickCodegenDriver,
+  slickCodegenOutputDir
+}
 import slick.{model => m}
 import slick.codegen.SourceCodeGenerator
 import slick.jdbc.PostgresProfile
@@ -5,32 +10,6 @@ import slick.jdbc.PostgresProfile
 lazy val dbUrl = "jdbc:postgresql://localhost/bookmark"
 lazy val dbUser = "postgres"
 lazy val dbPassword = "P@ssw0rd"
-
-slickCodegenDatabaseUrl := dbUrl
-slickCodegenDatabaseUser := dbUser
-slickCodegenDatabasePassword := dbPassword
-slickCodegenDriver := PostgresProfile
-slickCodegenJdbcDriver := "org.postgresql.Driver"
-slickCodegenOutputDir := baseDirectory.value / "modules" / "interface_adapter" / "src" / "main" / "scala"
-slickCodegenOutputPackage := "interface_adapter"
-slickCodegenExcludedTables := Seq("flyway_schema_history")
-slickCodegenCodeGenerator := { (model: m.Model) =>
-  new SourceCodeGenerator(model) {
-    override def code: String =
-      "import java.time.Instant\n" + "import io.jvm.uuid._\n" + super.code
-
-    override def Table = new Table(_) {
-      override def Column = new Column(_) {
-        override def rawType: String = model.tpe match {
-          case "java.sql.Timestamp" => "Instant"
-          case "java.util.UUID"     => "UUID"
-          case _                    => super.rawType
-        }
-      }
-    }
-  }
-}
-Compile / sourceGenerators += slickCodegen.taskValue
 
 lazy val accordV = "0.7.5"
 lazy val akkaV = "2.6.3"
@@ -106,6 +85,32 @@ lazy val root = (project in file("."))
       "com.typesafe.akka" %% "akka-http-core" % httpV,
       "com.typesafe.slick" %% "slick" % slickV,
       "io.jvm.uuid" %% "scala-uuid" % uuidV
-    )
+    ),
+    slickCodegenDatabaseUrl := dbUrl,
+    slickCodegenDatabaseUser := dbUser,
+    slickCodegenDatabasePassword := dbPassword,
+    slickCodegenDriver := PostgresProfile,
+    slickCodegenJdbcDriver := "org.postgresql.Driver",
+    slickCodegenOutputDir := baseDirectory.value / "src" / "main" / "scala",
+    slickCodegenOutputPackage := "database",
+    slickCodegenExcludedTables := Seq("flyway_schema_history"),
+    slickCodegenCodeGenerator := { (model: m.Model) =>
+      new SourceCodeGenerator(model) {
+        override def code: String =
+          "import java.time.Instant\n" + "import io.jvm.uuid._\n" + super.code
+
+        override def Table = new Table(_) {
+          override def Column = new Column(_) {
+            override def rawType: String = model.tpe match {
+              case "java.sql.Timestamp" => "Instant"
+              case "java.util.UUID"     => "UUID"
+              case _                    => super.rawType
+            }
+          }
+        }
+      }
+    },
+    Compile / sourceGenerators += slickCodegen.taskValue
   )
+  .dependsOn(interface_adapter, infrastructure)
   .aggregate(infrastructure, domain, use_case, interface_adapter)

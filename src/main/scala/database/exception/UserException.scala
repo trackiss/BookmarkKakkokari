@@ -1,4 +1,4 @@
-package interface_adapter.exception
+package database.exception
 
 import domain.models.user.{UserEmailAddress, UserId}
 
