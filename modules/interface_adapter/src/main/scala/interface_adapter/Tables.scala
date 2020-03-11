@@ -72,20 +72,21 @@ trait Tables {
    *  @param name Database column name SqlType(varchar)
    *  @param countItem Database column count_item SqlType(int4), Default(0)
    *  @param ownerId Database column owner_id SqlType(uuid)
+   *  @param bookmarkId Database column bookmark_id SqlType(uuid)
    *  @param isActive Database column is_active SqlType(bool), Default(true)
    *  @param createdAt Database column created_at SqlType(timestamp)
    *  @param updatedAt Database column updated_at SqlType(timestamp) */
-  case class TagsRow(id: UUID, name: String, countItem: Int = 0, ownerId: UUID, isActive: Boolean = true, createdAt: Instant, updatedAt: Instant)
+  case class TagsRow(id: UUID, name: String, countItem: Int = 0, ownerId: UUID, bookmarkId: UUID, isActive: Boolean = true, createdAt: Instant, updatedAt: Instant)
   /** GetResult implicit for fetching TagsRow objects using plain SQL queries */
   implicit def GetResultTagsRow(implicit e0: GR[UUID], e1: GR[String], e2: GR[Int], e3: GR[Boolean], e4: GR[Instant]): GR[TagsRow] = GR{
     prs => import prs._
-    TagsRow.tupled((<<[UUID], <<[String], <<[Int], <<[UUID], <<[Boolean], <<[Instant], <<[Instant]))
+    TagsRow.tupled((<<[UUID], <<[String], <<[Int], <<[UUID], <<[UUID], <<[Boolean], <<[Instant], <<[Instant]))
   }
   /** Table description of table tags. Objects of this class serve as prototypes for rows in queries. */
   class Tags(_tableTag: Tag) extends profile.api.Table[TagsRow](_tableTag, "tags") {
-    def * = (id, name, countItem, ownerId, isActive, createdAt, updatedAt) <> (TagsRow.tupled, TagsRow.unapply)
+    def * = (id, name, countItem, ownerId, bookmarkId, isActive, createdAt, updatedAt) <> (TagsRow.tupled, TagsRow.unapply)
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = ((Rep.Some(id), Rep.Some(name), Rep.Some(countItem), Rep.Some(ownerId), Rep.Some(isActive), Rep.Some(createdAt), Rep.Some(updatedAt))).shaped.<>({r=>import r._; _1.map(_=> TagsRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = ((Rep.Some(id), Rep.Some(name), Rep.Some(countItem), Rep.Some(ownerId), Rep.Some(bookmarkId), Rep.Some(isActive), Rep.Some(createdAt), Rep.Some(updatedAt))).shaped.<>({r=>import r._; _1.map(_=> TagsRow.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6.get, _7.get, _8.get)))}, (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column id SqlType(uuid), PrimaryKey */
     val id: Rep[UUID] = column[UUID]("id", O.PrimaryKey)
@@ -95,6 +96,8 @@ trait Tables {
     val countItem: Rep[Int] = column[Int]("count_item", O.Default(0))
     /** Database column owner_id SqlType(uuid) */
     val ownerId: Rep[UUID] = column[UUID]("owner_id")
+    /** Database column bookmark_id SqlType(uuid) */
+    val bookmarkId: Rep[UUID] = column[UUID]("bookmark_id")
     /** Database column is_active SqlType(bool), Default(true) */
     val isActive: Rep[Boolean] = column[Boolean]("is_active", O.Default(true))
     /** Database column created_at SqlType(timestamp) */
@@ -102,8 +105,10 @@ trait Tables {
     /** Database column updated_at SqlType(timestamp) */
     val updatedAt: Rep[Instant] = column[Instant]("updated_at")
 
-    /** Foreign key referencing Bookmarks (database name tags_owner_id_fkey) */
-    lazy val bookmarksFk = foreignKey("tags_owner_id_fkey", ownerId, Bookmarks)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+    /** Foreign key referencing Bookmarks (database name tags_bookmark_id_fkey) */
+    lazy val bookmarksFk = foreignKey("tags_bookmark_id_fkey", bookmarkId, Bookmarks)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
+    /** Foreign key referencing Users (database name tags_owner_id_fkey) */
+    lazy val usersFk = foreignKey("tags_owner_id_fkey", ownerId, Users)(r => r.id, onUpdate=ForeignKeyAction.NoAction, onDelete=ForeignKeyAction.NoAction)
   }
   /** Collection-like TableQuery object for table Tags */
   lazy val Tags = new TableQuery(tag => new Tags(tag))

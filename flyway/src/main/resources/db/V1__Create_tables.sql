@@ -25,7 +25,8 @@ CREATE TABLE tags (
   id          uuid      PRIMARY KEY,
   name        varchar   NOT NULL,
   count_item  int       NOT NULL DEFAULT 0,
-  owner_id    uuid      NOT NULL REFERENCES bookmarks,
+  owner_id    uuid      NOT NULL REFERENCES users,
+  bookmark_id uuid      NOT NULL REFERENCES bookmarks,
   is_active   boolean   NOT NULL DEFAULT true,
   created_at  timestamp NOT NULL,
   updated_at  timestamp NOT NULL
