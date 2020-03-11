@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ScalaCompilerConfiguration">
     <profile name="sbt 1" modules="bookmark,bookmarkkakkokari" />
-    <profile name="sbt 2" modules="BookmarkKakkokari,domain,flyway,infrastructure,interface,interface_adapter,root,use_case">
+    <profile name="sbt 2" modules="BookmarkKakkokari,domain,flyway,infrastructure,interface_adapter,root,use_case">
       <option name="deprecationWarnings" value="true" />
       <option name="uncheckedWarnings" value="true" />
       <option name="featureWarnings" value="true" />
