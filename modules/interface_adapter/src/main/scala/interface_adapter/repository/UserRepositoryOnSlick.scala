@@ -34,7 +34,7 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
       e2 <- email
       dupId = e1.map(_ => DuplicatedIdError)
       dupEmail = e2.map(_ => DuplicatedEmailAddressError)
-    } yield dupId.orElse(dupEmail)
+    } yield dupId orElse dupEmail
 
     error.transformWith {
       case Success(None) =>
