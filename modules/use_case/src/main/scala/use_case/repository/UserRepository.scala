@@ -1,7 +1,7 @@
 package use_case.repository
 
 import domain.models.user._
-import use_case.error.UserError
+import use_case.repository.error.UserError
 
 import scala.concurrent.{ExecutionContext, Future}
 

@@ -91,8 +91,8 @@ lazy val root = (project in file("."))
     slickCodegenDatabasePassword := dbPassword,
     slickCodegenDriver := PostgresProfile,
     slickCodegenJdbcDriver := "org.postgresql.Driver",
-    slickCodegenOutputDir := baseDirectory.value / "src" / "main" / "scala",
-    slickCodegenOutputPackage := "database",
+    slickCodegenOutputDir := baseDirectory.value / "modules" / "interface_adapter" / "src" / "main" / "scala",
+    slickCodegenOutputPackage := "interface_adapter.repository",
     slickCodegenExcludedTables := Seq("flyway_schema_history"),
     slickCodegenCodeGenerator := { (model: m.Model) =>
       new SourceCodeGenerator(model) {

@@ -1,19 +1,11 @@
-package database.repository
+package interface_adapter.repository
 
-import database.exception.{
-  UserDeleteFailedException,
-  UserFindByEmailAddressFailedException,
-  UserFindByIdFailedException,
-  UserInsertFailedException,
-  UserUpdateEmailAddressFailedException,
-  UserUpdatePasswordFailedException
-}
-import database.Tables
 import domain.models.user._
 import domain.models.ActiveStatus
+import interface_adapter.repository.exception._
 import slick.jdbc.{JdbcProfile, PostgresProfile}
 import slick.jdbc.PostgresProfile.api._
-import use_case.error.{
+import use_case.repository.error.{
   DuplicatedEmailAddressError,
   DuplicatedIdError,
   NotFoundIdError,

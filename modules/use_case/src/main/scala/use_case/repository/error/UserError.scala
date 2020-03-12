@@ -1,4 +1,4 @@
-package use_case.error
+package use_case.repository.error
 
 sealed trait UserError
 
