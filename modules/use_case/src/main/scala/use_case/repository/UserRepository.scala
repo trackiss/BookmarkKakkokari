@@ -10,11 +10,13 @@ trait UserRepository {
     implicit ec: ExecutionContext
   ): Future[Either[UserError, Unit]]
 
-  def findById(id: UserId)(implicit ec: ExecutionContext): Future[Option[User]]
+  def findById(id: UserId)(
+    implicit ec: ExecutionContext
+  ): Future[Either[UserError, User]]
 
   def findByEmailAddress(emailAddress: UserEmailAddress)(
     implicit ec: ExecutionContext
-  ): Future[Option[User]]
+  ): Future[Either[UserError, User]]
 
   def updateEmailAddress(id: UserId, emailAddress: UserEmailAddress)(
     implicit ec: ExecutionContext

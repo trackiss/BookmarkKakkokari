@@ -5,16 +5,10 @@ import domain.models.ActiveStatus
 import interface_adapter.repository.exception._
 import slick.jdbc.{JdbcProfile, PostgresProfile}
 import slick.jdbc.PostgresProfile.api._
-import use_case.repository.error.{
-  DuplicatedEmailAddressError,
-  DuplicatedIdError,
-  NotFoundIdError,
-  UserError
-}
+import use_case.repository.error._
 import use_case.repository.UserRepository
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
 class UserRepositoryOnSlick extends UserRepository with Tables {
 
@@ -28,34 +22,35 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
     val id = findById(user.id)
     val email = findByEmailAddress(user.emailAddress)
 
-    val error: Future[Option[UserError]] = for {
+    val error: Future[Either[UserError, User]] = for {
       e1 <- id
       e2 <- email
-      dupId = e1.map(_ => DuplicatedIdError)
-      dupEmail = e2.map(_ => DuplicatedEmailAddressError)
-    } yield dupId orElse dupEmail
+      dupId = e1.left.map(_ => DuplicatedIdError)
+      dupEmail = e2.left.map(_ => DuplicatedEmailAddressError)
+    } yield dupId.left.flatMap(_ => dupEmail)
 
-    error.transformWith {
-      case Success(None) =>
-        db.run(Users += entityToRow(user))
-          .transform(_ => Right(()), e => UserInsertFailedException(user.id, e))
-      case Success(Some(v)) => Future(Left(v))
-      case Failure(e)       => Future.failed(UserInsertFailedException(user.id, e))
-    }
+    error.transform(
+      v =>
+        v.map { _ =>
+          db.run(Users += entityToRow(user))
+          ()
+      },
+      e => UserInsertFailedException(user.id, e)
+    )
   }
 
   override def findById(
     id: UserId
-  )(implicit ec: ExecutionContext): Future[Option[User]] =
+  )(implicit ec: ExecutionContext): Future[Either[UserError, User]] =
     db.run(Users.findBy(_.id).applied(id.asUuid).result.headOption)
       .transform(
-        v => v.map(rowToEntity),
+        v => Either.cond(v.isDefined, rowToEntity(v.get), NotFoundIdError),
         e => UserFindByIdFailedException(id, e)
       )
 
   override def findByEmailAddress(
     emailAddress: UserEmailAddress
-  )(implicit ec: ExecutionContext): Future[Option[User]] =
+  )(implicit ec: ExecutionContext): Future[Either[UserError, User]] =
     db.run(
         Users
           .findBy(_.emailAddress)
@@ -64,7 +59,9 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
           .headOption
       )
       .transform(
-        v => v.map(rowToEntity),
+        v =>
+          Either
+            .cond(v.isDefined, rowToEntity(v.get), NotFoundEmailAddressError),
         e => UserFindByEmailAddressFailedException(emailAddress, e)
       )
 
