@@ -1,6 +1,6 @@
 package domain.models.user
 
-import domain.error.{InvalidEmailAddressError, UserError}
+import domain.error.UserError
 
 final case class UserEmailAddress private (private val value: String) {
   def asString: String = value
@@ -11,6 +11,6 @@ object UserEmailAddress {
     Either.cond(
       value.matches("""[^\s]+@[^\s]+"""),
       new UserEmailAddress(value),
-      InvalidEmailAddressError
+      UserError.InvalidEmailAddressError
     )
 }

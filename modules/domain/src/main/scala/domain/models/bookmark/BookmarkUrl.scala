@@ -1,6 +1,6 @@
 package domain.models.bookmark
 
-import domain.error.{BookmarkError, InvalidChracterUrlError, InvalidUrlError}
+import domain.error.BookmarkError
 
 final case class BookmarkUrl private (private val value: String) {
   def asString: String = value
@@ -12,8 +12,12 @@ object BookmarkUrl {
       e1 <- Either.cond(
         value.forall(c => 0x20 < c && c < 0x7f),
         new BookmarkUrl(value),
-        InvalidChracterUrlError
+        BookmarkError.InvalidChracterUrlError
       )
-      e2 <- Either.cond(value.matches("""[^\s]+:[^\s]+"""), e1, InvalidUrlError)
+      e2 <- Either.cond(
+        value.matches("""[^\s]+:[^\s]+"""),
+        e1,
+        BookmarkError.InvalidUrlError
+      )
     } yield e2
 }

@@ -1,7 +1,7 @@
 package domain.models.user
 
 import com.github.t3hnar.bcrypt._
-import domain.error.{IllegalEncryptedPasswordError, UserError}
+import domain.error.UserError
 
 import scala.util.Success
 
@@ -21,6 +21,6 @@ object UserEncryptedPassword {
     Either.cond(
       value.startsWith("""$2a$10"""),
       new UserEncryptedPassword(value),
-      IllegalEncryptedPasswordError
+      UserError.IllegalEncryptedPasswordError
     )
 }

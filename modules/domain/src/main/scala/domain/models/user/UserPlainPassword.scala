@@ -1,11 +1,7 @@
 package domain.models.user
 
 import com.github.t3hnar.bcrypt._
-import domain.error.{
-  InvalidCharacterPasswordError,
-  NotEnoughLengthPasswordError,
-  UserError
-}
+import domain.error.UserError
 
 final case class UserPlainPassword private (private val value: String) {
   def encrypt(salt: UserPasswordSalt): UserEncryptedPassword =
@@ -25,8 +21,12 @@ object UserPlainPassword {
       e1 <- Either.cond(
         value.forall(c => 0x20 < c && c < 0x7f),
         new UserPlainPassword(value),
-        InvalidCharacterPasswordError
+        UserError.InvalidCharacterPasswordError
       )
-      e2 <- Either.cond(value.length >= 4, e1, NotEnoughLengthPasswordError)
+      e2 <- Either.cond(
+        value.length >= 4,
+        e1,
+        UserError.NotEnoughLengthPasswordError
+      )
     } yield e2
 }
