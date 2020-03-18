@@ -42,7 +42,7 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
   override def findById(
     id: UserId
   )(implicit ec: ExecutionContext): Future[Either[UserError, User]] =
-    db.run(Users.findBy(_.id).applied(id.asUuid).result.headOption)
+    db.run(Users.filter(_.id === id.asUuid).result.headOption)
       .transform(
         v => v.map(rowToEntity).toRight(UserError.NotFoundIdError),
         e => UserFindByIdFailedException(id, e)
@@ -66,7 +66,7 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
   override def updateEmailAddress(id: UserId, emailAddress: UserEmailAddress)(
     implicit ec: ExecutionContext
   ): Future[Either[UserError, Unit]] = {
-    val query = Users.findBy(_.id).applied(id.asUuid)
+    val query = Users.filter(_.id === id.asUuid)
 
     db.run(query.result.headOption)
       .transform(
@@ -85,7 +85,7 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
     encryptedPassword: UserEncryptedPassword,
     passwordSalt: UserPasswordSalt
   )(implicit ec: ExecutionContext): Future[Either[UserError, Unit]] = {
-    val query = Users.findBy(_.id).applied(id.asUuid)
+    val query = Users.filter(_.id === id.asUuid)
 
     db.run(query.result.headOption)
       .transform(
@@ -106,7 +106,7 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
   override def deleteById(
     id: UserId
   )(implicit ec: ExecutionContext): Future[Either[UserError, Unit]] = {
-    val query = Users.findBy(_.id).applied(id.asUuid)
+    val query = Users.filter(_.id === id.asUuid)
 
     db.run(query.result.headOption)
       .transform(
