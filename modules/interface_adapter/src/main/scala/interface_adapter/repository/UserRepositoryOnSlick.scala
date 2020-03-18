@@ -44,9 +44,7 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
   )(implicit ec: ExecutionContext): Future[Either[UserError, User]] =
     db.run(Users.findBy(_.id).applied(id.asUuid).result.headOption)
       .transform(
-        v =>
-          Either
-            .cond(v.isDefined, rowToEntity(v.get), UserError.NotFoundIdError),
+        v => v.map(rowToEntity).toRight(UserError.NotFoundIdError),
         e => UserFindByIdFailedException(id, e)
       )
 
@@ -61,13 +59,7 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
           .headOption
       )
       .transform(
-        v =>
-          Either
-            .cond(
-              v.isDefined,
-              rowToEntity(v.get),
-              UserError.NotFoundEmailAddressError
-          ),
+        v => v.map(rowToEntity).toRight(UserError.NotFoundEmailAddressError),
         e => UserFindByEmailAddressFailedException(emailAddress, e)
       )
 
@@ -79,10 +71,11 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
     db.run(query.result.headOption)
       .transform(
         v =>
-          Either.cond(v.isDefined, {
-            db.run(query.map(_.emailAddress).update(emailAddress.asString))
-            ()
-          }, UserError.NotFoundIdError),
+          v.map { _ =>
+              db.run(query.map(_.emailAddress).update(emailAddress.asString))
+              ()
+            }
+            .toRight(UserError.NotFoundIdError),
         e => UserUpdateEmailAddressFailedException(id, e)
       )
   }
@@ -97,17 +90,15 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
     db.run(query.result.headOption)
       .transform(
         v =>
-          Either.cond(
-            v.isDefined, {
+          v.map { _ =>
               db.run(
                 query
                   .map(u => (u.encryptedPassword, u.passwordSalt))
                   .update(encryptedPassword.asString, passwordSalt.asString)
               )
               ()
-            },
-            UserError.NotFoundIdError
-        ),
+            }
+            .toRight(UserError.NotFoundIdError),
         e => UserUpdatePasswordFailedException(id, e)
       )
   }
@@ -120,10 +111,11 @@ class UserRepositoryOnSlick extends UserRepository with Tables {
     db.run(query.result.headOption)
       .transform(
         v =>
-          Either.cond(v.isDefined, {
-            db.run(query.delete)
-            ()
-          }, UserError.NotFoundIdError),
+          v.map { _ =>
+              db.run(query.delete)
+              ()
+            }
+            .toRight(UserError.NotFoundIdError),
         e => UserDeleteFailedException(id, e)
       )
   }
