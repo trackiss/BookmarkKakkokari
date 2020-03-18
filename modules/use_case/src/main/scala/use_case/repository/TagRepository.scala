@@ -16,11 +16,15 @@ trait TagRepository {
     implicit ec: ExecutionContext
   ): Future[Either[TagError, Tag]]
 
-  def findByName(userId: UserId, name: TagName)(
+  def findByUserId(userId: UserId)(
+    implicit ec: ExecutionContext
+  ): Future[Either[TagError, Tags]]
+
+  def findByUserIdWithName(userId: UserId, name: TagName)(
     implicit ec: ExecutionContext
   ): Future[Either[TagError, Tag]]
 
-  def findByUserId(userId: UserId)(
+  def findByUserIdWithKeyword(userId: UserId, keyword: String)(
     implicit ec: ExecutionContext
   ): Future[Either[TagError, Tags]]
 
